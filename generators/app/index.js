@@ -10,36 +10,31 @@ module.exports = yeoman.generators.Base.extend({
     this.option('skip-install');
   },
 
-  init: function(){
+  initializing : function(){
     var done = this.async();
-    var self = this;
 
     this.env.register('generator-loopback','lb');
     this.env.register('generator-aurelia/app/index.js','au');
-    this.aureliaGenerator = self.env.create('au',{ options: { 'skip-install':this.options['skip-install'] } });
+
     this.loopbackGenerator = this.env.create('lb',{ options: { 'skip-install':this.options['skip-install'] } });
-
-    this.aureliaGenerator.on('end', function(){
-        self.log('aurelia generator finished');
-    });
-
-
-    this.loopbackGenerator.on('end',function() {
-      self.destinationRoot(self.destinationRoot() + "/client");
-      self.aureliaGenerator.run();
-
-  });
-
-  this.loopbackGenerator.run();
-  done();
+    this.aureliaGenerator = this.env.create('au',{ options: { 'skip-install':this.options['skip-install'] } });
+    this.loopbackGenerator.run(function(){
+      this.log("run callback");
+      this.destinationRoot(this.destinationRoot() + "/client"); //should be avoided I guess
+      this.aureliaGenerator.run();
+    }.bind(this));
+    done();
   },
+
+
+
 
   prompting: function () {
     //var done = this.async();
 
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the ' + chalk.red('AureliaLoopback') + ' generator!'
+      'zzzzzzzzzzzzzzWelcome to the ' + chalk.red('AureliaLoopback') + ' generator!'
     ));
 
     /*var prompts = [{
@@ -59,6 +54,7 @@ module.exports = yeoman.generators.Base.extend({
 
   writing: {
     app: function () {
+      this.log("qqqqqqqqqqqqqqqqqqqqqq in writing ");
       /*this.fs.copy(
         this.templatePath('_package.json'),
         this.destinationPath('package.json')
